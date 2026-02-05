@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulateur Prototypage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #001F54;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #B42150;
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .logo-container {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            color: #001F54;
+            font-weight: 600;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header-content {
+            max-width: calc(100% - 100px);
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .type-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .type-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .type-btn:hover {
+            border-color: #B42150;
+            transform: translateY(-2px);
+        }
+        
+        .type-btn.active {
+            background: #B42150;
+            color: white;
+            border-color: transparent;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #B42150;
+        }
+        
+        .results {
+            background: #F0F1F1;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .result-item label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .result-item .value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #B42150;
+        }
+        
+        .result-highlight {
+            background: #B42150;
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 20px;
+            box-shadow: 0 8px 20px rgba(180, 33, 80, 0.3);
+        }
+        
+        .result-highlight .label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .result-highlight .value {
+            font-size: 36px;
+            font-weight: 700;
+        }
+        
+        .indicator {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .indicator.rentable {
+            background: #4caf50;
+            color: white;
+        }
+        
+        .indicator.faible {
+            background: #C7A0CB;
+            color: #001F54;
+        }
+        
+        .indicator.perte {
+            background: #B42150;
+            color: white;
+        }
+        
+        .indicator.prototype {
+            background: #C7A0CB;
+            color: #001F54;
+        }
+        
+        .footer {
+            background: #F0F1F1;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 11px;
+            color: #001F54;
+            border-top: 1px solid #e0e0e0;
+            line-height: 1.5;
+        }
+        
+        .footer-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .footer h3 {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #B42150;
+            letter-spacing: 0.5px;
+        }
+        
+        .footer p {
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        
+        .footer-divider {
+            width: 60px;
+            height: 2px;
+            background: #C7A0CB;
+            margin: 12px auto;
+            border-radius: 2px;
+        }
+        
+        .footer a {
+            color: #B42150;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .legal-section {
+            margin: 10px 0;
+        }
+        
+        .legal-item {
+            display: inline-block;
+            margin: 0 10px 5px 10px;
+        }
+        
+        .copyright {
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #001F54;
+        }
+        
+        .version {
+            font-size: 10px;
+            opacity: 0.6;
+            margin-top: 12px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo-container">
+               <img src="https://d1yei2z3i6k35z.cloudfront.net/13882048/68b9ba238c879_Logo.png" alt="Mon Logo" style="max-width: 140px; height: auto;">
+                    </div>
+            <div class="header-content">
+                <h1>Simulateur de Prix - Prototypage</h1>
+                <p>Calculez instantanément votre prix de vente en fonction du prototypage</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="type-selector">
+                <button class="type-btn" id="btnPrototype" onclick="selectType('prototype')">
+                    Prototype seul
+                </button>
+                <button class="type-btn active" id="btnProduction" onclick="selectType('production')">
+                    Prototype + Production
+                </button>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nom du projet</label>
+                    <input type="text" id="nomProjet" placeholder="Assiettes Restaurant X">
+                </div>
+                
+                <div class="form-group">
+                    <label>Coût standard pièce (€)</label>
+                    <input type="number" id="coutStandard" value="50" step="0.01" oninput="calculate()">
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 15px 0; color: #B42150; font-size: 18px; border-bottom: 2px solid #C7A0CB; padding-bottom: 10px;">📐 PROTOTYPAGE</h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nombre d'essais prototypes</label>
+                    <input type="number" id="nombreEssais" value="3" step="1" min="1" oninput="calculate()">
+                </div>
+                
+                <div class="form-group">
+                    <label>Temps recherche (h)</label>
+                    <input type="number" id="tempsRecherche" value="10" step="0.5" oninput="calculate()">
+                </div>
+                
+                <div class="form-group">
+                    <label>Temps personnalisation prototype (h)</label>
+                    <input type="number" id="tempsPerso" value="5" step="0.5" oninput="calculate()">
+                </div>
+                
+                <div class="form-group">
+                    <label>Taux horaire prototype (€/h)</label>
+                    <input type="number" id="tauxHoraire" value="40" step="1" oninput="calculate()">
+                </div>
+            </div>
+            
+            <h3 style="margin: 30px 0 15px 0; color: #001F54; font-size: 18px; border-bottom: 2px solid #C7A0CB; padding-bottom: 10px;">🏭 PRODUCTION</h3>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Temps personnalisation / pièce produite (h)</label>
+                    <input type="number" id="tempsPersoParPiece" value="0.5" step="0.1" oninput="calculate()">
+                </div>
+                
+                <div class="form-group">
+                    <label>Taux de rebus (%)</label>
+                    <input type="number" id="tauxRebus" value="15" step="1" min="0" max="100" oninput="calculate()">
+                </div>
+                
+                <div class="form-group" id="groupQuantite">
+                    <label>Quantité commandée</label>
+                    <input type="number" id="quantite" value="200" step="1" oninput="calculate()">
+                </div>
+                
+                <div class="form-group" id="groupMarge">
+                    <label>Marge cible (%)</label>
+                    <input type="number" id="margeCible" value="20" step="1" min="0" max="100" oninput="calculate()">
+                </div>
+            </div>
+            
+            <div class="results">
+                <div class="result-item">
+                    <label>Coût prototype</label>
+                    <span class="value" id="resultCoutProto">0 €</span>
+                </div>
+                
+                <div class="result-item" id="resultQteReelle">
+                    <label>Quantité à produire (avec rebus)</label>
+                    <span class="value" id="resultQte">0</span>
+                </div>
+                
+                <div class="result-item">
+                    <label>Coût total production</label>
+                    <span class="value" id="resultCoutTotal">0 €</span>
+                </div>
+                
+                <div class="result-highlight" id="resultPrixVente">
+                    <div class="label">PRIX DE VENTE UNITAIRE MINIMUM</div>
+                    <div class="value" id="resultPrix">0 €</div>
+                </div>
+                
+                <div class="result-item">
+                    <label>CA total si vendu à ce prix</label>
+                    <span class="value" id="resultCA">0 €</span>
+                </div>
+                
+                <div class="result-item">
+                    <label>Résultat net</label>
+                    <span class="value" id="resultNet">0 €</span>
+                </div>
+                
+                <div class="result-item">
+                    <label>Indicateur</label>
+                    <span class="indicator" id="resultIndicateur">🟢 RENTABLE</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-content">
+                <div class="copyright">© 2026 CERISE UP - Tous droits réservés</div>
+                
+                <p>Cet outil est protégé par les droits d'auteur. Toute reproduction, distribution ou utilisation commerciale sans autorisation expresse est interdite.</p>
+                
+                <div class="footer-divider"></div>
+                
+                <div class="legal-section">
+                    <div class="legal-item"><strong>Propriétaire :</strong> CERISE UP</div>
+                    <div class="legal-item"><strong>Contact :</strong> <a href="mailto:contact@ceriseup.fr">contact@ceriseup.fr</a></div>
+                </div>
+                
+                <p><strong>Usage :</strong> Outil fourni à titre indicatif. Les calculs sont basés sur vos données. CERISE UP ne peut être tenu responsable des décisions commerciales prises.</p>
+                
+                <p><strong>Données :</strong> Aucune donnée n'est collectée ni stockée. Tous les calculs sont effectués localement dans votre navigateur.</p>
+                
+                <div class="version">Version 1.0 - Janvier 2026</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let currentType = 'production';
+        
+        function selectType(type) {
+            currentType = type;
+            
+            const btnPrototype = document.getElementById('btnPrototype');
+            const btnProduction = document.getElementById('btnProduction');
+            const groupQuantite = document.getElementById('groupQuantite');
+            const groupMarge = document.getElementById('groupMarge');
+            const resultQteReelle = document.getElementById('resultQteReelle');
+            const resultPrixVente = document.getElementById('resultPrixVente');
+            
+            if (type === 'prototype') {
+                btnPrototype.classList.add('active');
+                btnProduction.classList.remove('active');
+                groupQuantite.classList.add('hidden');
+                groupMarge.classList.add('hidden');
+                resultQteReelle.classList.add('hidden');
+                resultPrixVente.classList.add('hidden');
+            } else {
+                btnPrototype.classList.remove('active');
+                btnProduction.classList.add('active');
+                groupQuantite.classList.remove('hidden');
+                groupMarge.classList.remove('hidden');
+                resultQteReelle.classList.remove('hidden');
+                resultPrixVente.classList.remove('hidden');
+            }
+            
+            calculate();
+        }
+        
+        function formatEuro(nombre) {
+            return nombre.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, " ").replace('.', ',') + ' €';
+        }
+        
+        function calculate() {
+            const coutStandard = parseFloat(document.getElementById('coutStandard').value) || 0;
+            const nombreEssais = parseFloat(document.getElementById('nombreEssais').value) || 1;
+            const tempsRecherche = parseFloat(document.getElementById('tempsRecherche').value) || 0;
+            const tempsPerso = parseFloat(document.getElementById('tempsPerso').value) || 0;
+            const tempsPersoParPiece = parseFloat(document.getElementById('tempsPersoParPiece').value) || 0;
+            const tauxHoraire = parseFloat(document.getElementById('tauxHoraire').value) || 0;
+            const tauxRebus = parseFloat(document.getElementById('tauxRebus').value) || 0;
+            const quantite = parseFloat(document.getElementById('quantite').value) || 0;
+            const margeCible = parseFloat(document.getElementById('margeCible').value) || 0;
+            
+            // Coût prototype = (coût standard × nb essais) + temps recherche + temps perso
+            const coutPrototype = (coutStandard * nombreEssais) + (tempsRecherche * tauxHoraire) + (tempsPerso * tauxHoraire);
+            document.getElementById('resultCoutProto').textContent = formatEuro(coutPrototype);
+            
+            if (currentType === 'prototype') {
+                // Mode Prototype seul
+                document.getElementById('resultCoutTotal').textContent = formatEuro(coutPrototype);
+                document.getElementById('resultCA').textContent = formatEuro(coutPrototype);
+                document.getElementById('resultNet').textContent = '0,00 €';
+                document.getElementById('resultIndicateur').textContent = '⚪ PROTOTYPE SEUL';
+                document.getElementById('resultIndicateur').className = 'indicator prototype';
+            } else {
+                // Mode Production
+                const qteReelle = Math.ceil(quantite / (1 - tauxRebus / 100));
+                document.getElementById('resultQte').textContent = qteReelle + ' pièces';
+                
+                // Coût d'une pièce personnalisée = coût standard + temps perso par pièce
+                const coutPiecePersonnalisee = coutStandard + (tempsPersoParPiece * tauxHoraire);
+                
+                // Coût total = (coût pièce perso × qté réelle) + prototype
+                const coutTotalProduction = (coutPiecePersonnalisee * qteReelle) + coutPrototype;
+                document.getElementById('resultCoutTotal').textContent = formatEuro(coutTotalProduction);
+                
+                const prixVenteMin = coutTotalProduction / (quantite * (1 - margeCible / 100));
+                document.getElementById('resultPrix').textContent = formatEuro(prixVenteMin);
+                
+                const ca = prixVenteMin * quantite;
+                document.getElementById('resultCA').textContent = formatEuro(ca);
+                
+                const resultatNet = ca - coutTotalProduction;
+                document.getElementById('resultNet').textContent = formatEuro(resultatNet);
+                
+                // Indicateur
+                const indicateur = document.getElementById('resultIndicateur');
+                if (resultatNet < 0) {
+                    indicateur.textContent = '🔴 PERTE';
+                    indicateur.className = 'indicator perte';
+                } else if (margeCible < 20) {
+                    indicateur.textContent = '🟡 MARGE FAIBLE';
+                    indicateur.className = 'indicator faible';
+                } else {
+                    indicateur.textContent = '🟢 RENTABLE';
+                    indicateur.className = 'indicator rentable';
+                }
+            }
+        }
+        
+        // Calcul initial
+        calculate();
+    </script>
+</body>
+</html>
